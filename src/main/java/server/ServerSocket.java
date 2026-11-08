@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package server;
 
 import java.time.LocalDateTime;
@@ -27,3 +28,10 @@ public class ServerSocket {
    
     // Obtener lista de clientes
 }
+=======
+package server;
+
+public class ServerSocket {
+
+}
+>>>>>>> unai
