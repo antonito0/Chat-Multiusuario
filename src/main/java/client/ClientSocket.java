@@ -1,24 +1,27 @@
 package client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import model.Mensaje;
+
 public class ClientSocket {
+
     private Socket socket;
-    private PrintWriter salida;
-    private BufferedReader entrada;
+    private ObjectOutputStream salida;
+    private ObjectInputStream entrada;
 
     private boolean conectado = false;
 
     // Conectar con el servidor
-    public boolean conectar( int puerto) {
+    public boolean conectar(int puerto) {
         try {
-            socket = new Socket("localhost",puerto);
-            salida = new PrintWriter(socket.getOutputStream(), true);
-            entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket = new Socket("localhost", puerto);
+            salida = new ObjectOutputStream(socket.getOutputStream());
+            salida.flush();
+            entrada = new ObjectInputStream(socket.getInputStream());
             conectado = true;
             System.out.println("Conectado al servidor.");
             return true;
@@ -26,5 +29,42 @@ public class ClientSocket {
             System.out.println("Error al conectar: " + e.getMessage());
             return false;
         }
+    }
+
+    // Enviar un mensaje al servidor (le envia un objeto Mensaje)
+    public void enviarMensaje(Mensaje mensaje) {
+        try {
+            salida.writeObject(mensaje);
+            salida.flush();
+        } catch (IOException e) {
+            System.out.println("Error al enviar el mensaje.");
+        }
+    }
+
+    // Recibir un mensaje del servidor(recibe un objeto Mensaje)
+    public Mensaje recibirMensaje() {
+        try {
+            return (Mensaje) entrada.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error al recibir el mensaje.");
+            return null;
+        }
+    }
+
+    // Desconectar del servidor
+    public void desconectar() {
+        try {
+            conectado = false;
+            if (socket != null) {
+                socket.close();
+            }
+            System.out.println("Desconectado del servidor.");
+        } catch (IOException e) {
+            System.out.println("Error al desconectar.");
+        }
+    }
+
+    public boolean isConectado() { //con esto comprobamos si el cliente esta conectado o no al servidor
+        return conectado;
     }
 }
