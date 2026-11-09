@@ -40,6 +40,7 @@ public class ClienteHandler extends Thread {
                 // Guardar el nombre del usuario la primera vez que envía un mensaje
                 if (usuario == null) {
                     usuario = mensaje.getRemitente();
+                    LogServidor.usuarioEntra(usuario);
                 }
 
                 // Comprobar el tipo de mensaje recibido
@@ -56,6 +57,10 @@ public class ClienteHandler extends Thread {
                 socket.close();
             } catch (IOException e) {
                 System.out.println("Error al cerrar la conexión.");
+            }
+
+            if (usuario != null) {
+                LogServidor.usuarioSale(usuario);
             }
 
             Servidor.eliminarCliente(this); // this significa el objeto actual, ya que el método eliminar recibe un objeto ClienteHandler
