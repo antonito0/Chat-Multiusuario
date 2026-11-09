@@ -15,6 +15,7 @@ public class Mensaje implements Serializable {
     public static final String LISTA_CLIENTES = "lista_clientes";
     public static final String MENSAJE_PUBLICO = "mensaje_publico";
     public static final String MENSAJE_PRIVADO = "mensaje_privado";
+    public static final String CONEXION = "conexion";
 
     // Variables
     private String tipo;
@@ -57,7 +58,7 @@ public class Mensaje implements Serializable {
         return tipo;
     }
     public List<String> getClientes() {
-    return clientes;
+        return clientes;
     }   
     public String getContenido() {
         return contenido;
@@ -67,5 +68,13 @@ public class Mensaje implements Serializable {
     }
     public String getDestinatario() {
         return destinatario;
+    }
+
+    // Mensaje que envía el cliente al conectarse para decir quién es
+    public static Mensaje conexion(String usuario) {
+        Mensaje m = new Mensaje(usuario);
+        m.tipo = CONEXION;
+        m.remitente = usuario;
+        return m;
     }
 }

@@ -27,32 +27,44 @@ public class ClienteHandler extends Thread {
 
     // Atender al cliente
     @Override
-    public void run() { // ejecuta el hilo cuando se llama al método start() de la clase ClienteHandler
+    public void run() {
         try {
-            while (!socket.isClosed()) { // permite recibir mensajes continuamente si cumple la condición
+            while (!socket.isClosed()) {
 
-                // Recibir un mensaje del cliente y convertirlo a un objeto Mensaje
+                // Recibir un mensaje del cliente
                 Mensaje mensaje = (Mensaje) entrada.readObject();
-                
-                //Asi cada vez que un cliente envie un mensaje, el servidor guardara quien lo ha enviado y su contenido 
-                Servidor.registrarMensaje(mensaje.getRemitente() + ": " + mensaje.getContenido());
-                
-                // Guardar el nombre del usuario la primera vez que envía un mensaje
-                if (usuario == null) {
+                String tipo = mensaje.getTipo();
+
+                if (tipo.equals(Mensaje.CONEXION)) {
+                    // Mensaje de conexión: guardamos el usuario y lo registramos en el log
                     usuario = mensaje.getRemitente();
                     LogServidor.usuarioEntra(usuario);
-                }
 
-                // Comprobar el tipo de mensaje recibido
-                if (mensaje.getTipo().equals(Mensaje.MENSAJE_PUBLICO)) {
-                    enviarPublico(mensaje);
-                } else if (mensaje.getTipo().equals(Mensaje.MENSAJE_PRIVADO)) {
-                    enviarPrivado(mensaje);
+                } else {
+                    // Por si llega un mensaje sin haber enviado la conexión
+                    if (usuario == null) {
+                        usuario = mensaje.getRemitente();
+                        LogServidor.usuarioEntra(usuario);
+                    }
+
+                    // Guardar el último mensaje para el monitor
+                    Servidor.registrarMensaje(mensaje.getRemitente() + ": " + mensaje.getContenido());
+
+                    // Comprobar el tipo de mensaje recibido
+                    if (tipo.equals(Mensaje.MENSAJE_PUBLICO)) {
+                        LogServidor.mensajePublico(mensaje.getRemitente(), mensaje.getContenido());
+                        enviarPublico(mensaje);
+                    } else if (tipo.equals(Mensaje.MENSAJE_PRIVADO)) {
+                        LogServidor.mensajePrivado(mensaje.getRemitente(),
+                                mensaje.getDestinatario(), mensaje.getContenido());
+                        enviarPrivado(mensaje);
+                    }
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Un cliente se ha desconectado.");
-        } finally { // se ejecuta cuando termina la atención del cliente. Cerramos el socket y eliminamos el cliente de la lista del servidor
+        } finally {
+            // Cerramos el socket, registramos la salida y eliminamos el cliente de la lista
             try {
                 socket.close();
             } catch (IOException e) {
@@ -63,7 +75,7 @@ public class ClienteHandler extends Thread {
                 LogServidor.usuarioSale(usuario);
             }
 
-            Servidor.eliminarCliente(this); // this significa el objeto actual, ya que el método eliminar recibe un objeto ClienteHandler
+            Servidor.eliminarCliente(this);
         }
     }
 
