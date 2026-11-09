@@ -23,7 +23,6 @@ public class Servidor {
     private static String ultimoMensaje = "Todavía no se han recibido mensajes";
     private static LocalDateTime fechaUltimoMensaje = null;
 
-
     // Iniciar servidor
     public static void main(String[] args) {
     try (ServerSocket servidor = new ServerSocket(PUERTO)) { //ServerSocket para abrir el puerto y esperar conexiones

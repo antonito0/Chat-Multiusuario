@@ -23,13 +23,13 @@ public class Mensaje implements Serializable {
     private String remitente;
     private String destinatario;
 
-    // Constructor para respuestas del servidor
+    // Constructor para las respuestas del servidor
     public Mensaje(String respuesta) {
         this.tipo = RESPUESTA_SERVER;
         this.contenido = respuesta;
     }
 
-    // Constructor para listas de clientes
+    // Constructor para las listas de clientes
    public Mensaje(List<String> clientes, String contenido,String remitente) {
         this.tipo = LISTA_CLIENTES;//indica que es un mensaje con la lista de usuarios
         this.clientes = clientes;
