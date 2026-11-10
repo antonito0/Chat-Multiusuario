@@ -14,18 +14,29 @@ public class ClientSocket {
     private ObjectInputStream entrada;
 
     private boolean conectado = false;
+    private boolean servidorLleno = false;
 
     // Conectar con el servidor
     public boolean conectar(int puerto) {
+        servidorLleno = false;
         try {
             socket = new Socket("localhost", puerto);
             salida = new ObjectOutputStream(socket.getOutputStream());
             salida.flush();
             entrada = new ObjectInputStream(socket.getInputStream());
+
+            // El servidor responde si nos acepta o si está lleno
+            Mensaje respuesta = (Mensaje) entrada.readObject();
+            if (Mensaje.SERVIDOR_LLENO.equals(respuesta.getContenido())) {
+                servidorLleno = true;
+                socket.close();
+                return false;
+            }
+
             conectado = true;
             System.out.println("Conectado al servidor.");
             return true;
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error al conectar: " + e.getMessage());
             return false;
         }
@@ -66,5 +77,10 @@ public class ClientSocket {
 
     public boolean isConectado() { //con esto comprobamos si el cliente esta conectado o no al servidor
         return conectado;
+    }
+
+    //Nos dice si hay sitio en el servidor
+    public boolean isServidorLleno() {
+        return servidorLleno;
     }
 }

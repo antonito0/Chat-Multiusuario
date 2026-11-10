@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import client.ClientSocket;
 import client.ConexionThread;
 import model.Mensaje;
-
+import server.Servidor;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -73,9 +73,12 @@ public class VentanaChatController implements Initializable {
                 conDisconLabel.setText("Conectado");
                 hiloRecepcion = new ConexionThread(cliente, this);
                 hiloRecepcion.start();
+            } else if (cliente.isServidorLleno()) {
+                conDisconLabel.setText("Servidor lleno");
             } else {
                 conDisconLabel.setText("Error de conexión");
             }
+            
         } catch (NumberFormatException e) {
             conDisconLabel.setText("Introduce un puerto válido");
         }
