@@ -29,7 +29,7 @@ public class Servidor {
 
         System.out.println("Servidor iniciado en el puerto " + PUERTO);
 
-        // Iniciar el monitor del servidor para el tiempo la clase MonitorServidor |||||||||||||||||||
+        // Iniciar el monitor del servidor para el tiempo la clase MonitorServidor 
         MonitorServidor monitor = new MonitorServidor(inicioServidor);
         monitor.start();
 
