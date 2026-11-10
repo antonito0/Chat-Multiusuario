@@ -47,7 +47,8 @@ public class Servidor {
                     // Iniciar el hilo del cliente
                     cliente.start();
                     System.out.println("Cliente añadido. Clientes conectados: " + obtenerClientes().size());
-                } else {
+                } else { 
+                    //mandar un mensaje de error al cliente y cerrar la conexión
                     System.out.println("Servidor lleno. Cliente rechazado.");
                     socket.close();
                 }
