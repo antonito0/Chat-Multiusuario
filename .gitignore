@@ -1,0 +1,8 @@
+# VSCode settings
+.vscode/
+
+# Netbeans settings
+nbproject/private/
+
+# Maven target directory
+target/

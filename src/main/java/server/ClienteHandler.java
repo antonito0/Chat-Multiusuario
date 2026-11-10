@@ -40,6 +40,12 @@ public class ClienteHandler extends Thread {
                     usuario = mensaje.getRemitente();
                     LogServidor.usuarioEntra(usuario);
 
+                    Mensaje aviso = new Mensaje(
+                        Mensaje.MENSAJE_PUBLICO,"SERVIDOR", null,usuario + " se ha conectado."
+                    );
+
+                    enviarPublico(aviso);
+
                 } else {
                     // Por si llega un mensaje sin haber enviado la conexión
                     if (usuario == null) {
@@ -73,6 +79,13 @@ public class ClienteHandler extends Thread {
 
             if (usuario != null) {
                 LogServidor.usuarioSale(usuario);
+                Mensaje aviso = new Mensaje(
+                    Mensaje.MENSAJE_PUBLICO,
+                    "SERVIDOR",
+                    null,
+                    usuario + " se ha desconectado."
+                );
+                enviarPublico(aviso);
             }
 
             Servidor.eliminarCliente(this);
@@ -88,12 +101,30 @@ public class ClienteHandler extends Thread {
 
     // Enviar un mensaje privado al destinatario y al remitente
     private void enviarPrivado(Mensaje mensaje) {
+        boolean encontrado = false;
         for (ClienteHandler cliente : Servidor.obtenerClientes()) {
-            if (cliente.usuario != null &&
-                (cliente.usuario.equals(mensaje.getDestinatario()) ||cliente.usuario.equals(mensaje.getRemitente()))) {
+            if (cliente.usuario != null &&cliente.usuario.equals(mensaje.getDestinatario())) {
+                cliente.enviarMensaje(mensaje);
+                encontrado = true;
+            }
+            // Para que el remitente vea su propio mensaje
+            if (cliente.usuario != null &&cliente.usuario.equals(mensaje.getRemitente())) {
                 cliente.enviarMensaje(mensaje);
             }
         }
+        if (!encontrado) {
+            Mensaje error = new Mensaje();
+            error.setTipo("ERROR");
+            error.setContenido("El usuario "+ mensaje.getDestinatario()+ " no está conectado");
+
+            for (ClienteHandler cliente : Servidor.obtenerClientes()) {
+                if (cliente.usuario != null &&
+                    cliente.usuario.equals(mensaje.getRemitente())) {
+                    cliente.enviarMensaje(error);
+                    break;
+                }
+            }
+}
     }
 
     // Permite que el servidor envíe un mensaje a este cliente (le envía un objeto Mensaje)
