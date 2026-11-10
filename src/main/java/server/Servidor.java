@@ -4,6 +4,9 @@ package server;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.Mensaje;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
@@ -11,7 +14,7 @@ import java.net.ServerSocket;
 public class Servidor {
 
     private static final int PUERTO = 5000;
-    private static final int MAX_CLIENTES = 10;
+    private  static final int MAX_CLIENTES = 10;
 
     // Lista de clientes conectados
     private static ArrayList<ClienteHandler> clientes = new ArrayList<>();
@@ -36,7 +39,6 @@ public class Servidor {
         // Esperar conexiones continuamente
         while (true) {
             Socket socket = servidor.accept();
-            System.out.println("Nuevo cliente conectado.");
 
             try {
                 // Crear un objeto para atender al cliente en su propio hilo
@@ -45,9 +47,11 @@ public class Servidor {
                 // Comprobar si hay espacio para el nuevo cliente
                 if (añadirCliente(cliente)) {
                     // Iniciar el hilo del cliente
+                    cliente.enviarMensaje(new Mensaje(Mensaje.CONEXION_OK));
                     cliente.start();
-                    System.out.println("Cliente añadido. Clientes conectados: " + obtenerClientes().size());
+                    System.out.println("Nuevo cliente conectado. Clientes conectados: " + obtenerClientes().size());
                 } else {
+                    cliente.enviarMensaje(new Mensaje(Mensaje.SERVIDOR_LLENO));
                     System.out.println("Servidor lleno. Cliente rechazado.");
                     socket.close();
                 }

@@ -3,8 +3,6 @@ package model;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class Mensaje implements Serializable {
 
@@ -16,6 +14,8 @@ public class Mensaje implements Serializable {
     public static final String MENSAJE_PUBLICO = "mensaje_publico";
     public static final String MENSAJE_PRIVADO = "mensaje_privado";
     public static final String CONEXION = "conexion";
+    public static final String CONEXION_OK = "conexion_ok";
+    public static final String SERVIDOR_LLENO = "servidor_lleno";
 
     // Variables
     private String tipo;
