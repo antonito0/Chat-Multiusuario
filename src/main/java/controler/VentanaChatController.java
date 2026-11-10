@@ -62,8 +62,14 @@ public class VentanaChatController implements Initializable {
     private void conectar() {
         try {
             int puerto = Integer.parseInt(puertoField.getText());
+            String usuario = userField.getText().trim();
+            if (usuario.isEmpty()) {
+                conDisconLabel.setText("Introduce un usuario");
+                return;
+            }
             cliente = new ClientSocket();
             if (cliente.conectar(puerto)) {
+                cliente.enviarMensaje(Mensaje.conexion(usuario));
                 conDisconLabel.setText("Conectado");
                 hiloRecepcion = new ConexionThread(cliente, this);
                 hiloRecepcion.start();
@@ -110,6 +116,13 @@ public class VentanaChatController implements Initializable {
         mensajeField.clear();
     }
 
+    @FXML
+    private void alternarPrivado() {
+        boolean privado = privMessBox.isSelected();
+        paraLabel.setVisible(privado);
+        paraField.setVisible(privado);
+    }
+
    // Mostrar un mensaje recibido y añadirlo a la lista visual
     public void recibirMensaje(Mensaje mensaje) {
         // Tenemos dos hilos trabajando: el hilo de recepción,
@@ -128,8 +141,12 @@ public class VentanaChatController implements Initializable {
                 String texto = mensaje.getContenido();
                 // Comprobamos que el mensaje tenga un remitente.
                 if (mensaje.getRemitente() != null) {
-                    // Añadimos el nombre del remitente delante del mensaje.
-                    texto = mensaje.getRemitente() + ": " + texto;
+                    // Añadimos el nombre del remitente delante del mensaje. Si es privado, marcamos el remitente con (PRIVADO)
+                    if (mensaje.getTipo().equals(Mensaje.MENSAJE_PRIVADO)) {
+                        texto = mensaje.getRemitente() + " (PRIVADO): " + texto;
+                    } else {
+                        texto = mensaje.getRemitente() + ": " + texto;
+                    }
                 }
                 // Añadimos el mensaje a la lista visual del chat.
                 messageList.getItems().add(texto);
